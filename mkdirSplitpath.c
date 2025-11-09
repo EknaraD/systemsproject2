@@ -10,9 +10,43 @@ void mkdir(char pathName[]){
     //
     // YOUR CODE TO REPLACE THE PRINTF FUNCTION BELOW
 
-    printf("TO BE IMPLEMENTED\n");
+    char baseName[64], dirName[128];
+    struct NODE* parent = splitPath(pathName, baseName, dirName);
 
-    return;
+    if (!parent) {
+        printf("MKDIR ERROR: invalid path\n");
+        return;
+    }
+
+    // Check for duplicate
+    struct NODE* child = parent->childPtr;
+    while (child) {
+        if (strcmp(child->name, baseName) == 0) {
+            printf("MKDIR ERROR: directory %s already exists\n", baseName);
+            return;
+        }
+        child = child->siblingPtr;
+    }
+
+    // Allocate and initialize new directory node
+    struct NODE* newDir = (struct NODE*)malloc(sizeof(struct NODE));
+    strcpy(newDir->name, baseName);
+    newDir->fileType = 'D';
+    newDir->childPtr = NULL;
+    newDir->siblingPtr = NULL;
+    newDir->parentPtr = parent;
+
+    // Insert into parent's child list
+    if (!parent->childPtr)
+        parent->childPtr = newDir;
+    else {
+        struct NODE* temp = parent->childPtr;
+        while (temp->siblingPtr)
+            temp = temp->siblingPtr;
+        temp->siblingPtr = newDir;
+    }
+
+    printf("MKDIR SUCCESS: node %s successfully created\n", baseName);
 }
 
 //handles tokenizing and absolute/relative pathing options
@@ -23,7 +57,42 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
     // rm, rmdir, ls, cd, touch COMMANDS WILL NOT EXECUTE CORRECTLY
     // SEE THE PROVIDED SOLUTION EXECUTABLE TO SEE THEIR EXPECTED BEHAVIOR
 
-    // YOUR CODE HERE
-    //
-    return NULL;
+    char temp[128];
+    strcpy(temp, pathName);
+
+    // Find last slash
+    char* lastSlash = strrchr(temp, '/');
+    if (lastSlash) {
+        *lastSlash = '\0';
+        strcpy(baseName, lastSlash + 1);
+        strcpy(dirName, temp);
+    } else {
+        strcpy(baseName, temp);
+        strcpy(dirName, "");
+    }
+
+    // Determine start node
+    struct NODE* current = (pathName[0] == '/') ? root : cwd;
+
+    // If dirName empty, return start
+    if (strlen(dirName) == 0)
+        return current;
+
+    // Traverse directories
+    char pathCopy[128];
+    strcpy(pathCopy, dirName);
+    char* token = strtok(pathCopy, "/");
+
+    while (token && current) {
+        struct NODE* child = current->childPtr;
+        while (child && strcmp(child->name, token) != 0)
+            child = child->siblingPtr;
+
+        if (!child || child->fileType != 'D')
+            return NULL; // invalid path
+
+        current = child;
+        token = strtok(NULL, "/");
+    }
+    return current;
 }
