@@ -14,7 +14,7 @@ void mkdir(char pathName[]){
     struct NODE* parent = splitPath(pathName, baseName, dirName);
 
     if (!parent) {
-        printf("MKDIR ERROR: invalid path\n");
+        printf("ERROR: directory %s does not exist\n", dirName);
         return;
     }
 
@@ -46,8 +46,20 @@ void mkdir(char pathName[]){
         temp->siblingPtr = newDir;
     }
 
-    printf("MKDIR SUCCESS: node %s successfully created\n", baseName);
+    // Construct full path for nicer output
+    char fullPath[128] = "";
+    if (pathName[0] == '/') {
+        strcpy(fullPath, pathName);
+    } else {
+        if (strlen(dirName) > 0)
+            sprintf(fullPath, "%s/%s", dirName, baseName);
+        else
+            strcpy(fullPath, baseName);
+    }
+
+    printf("MKDIR SUCCESS: node %s successfully created\n", fullPath);
 }
+
 
 //handles tokenizing and absolute/relative pathing options
 struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
