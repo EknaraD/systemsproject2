@@ -16,8 +16,6 @@ void mkdir(char pathName[]){
     if (strlen(pathName) == 0 || strcmp(pathName, "/") == 0) {
         if (strlen(pathName) == 0)
             printf("MKDIR ERROR: no path provided\n");
-        else
-            printf("MKDIR ERROR: cannot create root directory\n");
         return;
     }
 
