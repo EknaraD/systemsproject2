@@ -12,14 +12,12 @@ void mkdir(char pathName[]){
 
     char baseName[64], dirName[128];
 
-    // Handle empty argument
-    if (strlen(pathName) == 0 || strcmp(pathName, "") == 0) {
-        printf("MKDIR ERROR: no path provided\n");
-        return;
-    }
-
-    if (strcmp(pathName, "/") == 0) {
-        printf("MKDIR ERROR: cannot create root directory\n");
+    // Handle empty or missing argument
+    if (strlen(pathName) == 0 || strcmp(pathName, "/") == 0) {
+        if (strlen(pathName) == 0)
+            printf("MKDIR ERROR: no path provided\n");
+        else
+            printf("MKDIR ERROR: cannot create root directory\n");
         return;
     }
 
@@ -40,7 +38,7 @@ void mkdir(char pathName[]){
         child = child->siblingPtr;
     }
 
-    // Allocate and initialize new directory
+    // Create and link new directory
     struct NODE* newDir = (struct NODE*)malloc(sizeof(struct NODE));
     strcpy(newDir->name, baseName);
     newDir->fileType = 'D';
@@ -48,7 +46,6 @@ void mkdir(char pathName[]){
     newDir->siblingPtr = NULL;
     newDir->parentPtr = parent;
 
-    // Attach to parent's children list
     if (!parent->childPtr)
         parent->childPtr = newDir;
     else {
