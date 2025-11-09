@@ -11,6 +11,19 @@ void mkdir(char pathName[]){
     // YOUR CODE TO REPLACE THE PRINTF FUNCTION BELOW
 
     char baseName[64], dirName[128];
+
+    // Check for no argument
+    if (strlen(pathName) == 0 || strcmp(pathName, "") == 0) {
+        printf("MKDIR ERROR: no path provided\n");
+        return;
+    }
+
+    // Handle root-only case (invalid)
+    if (strcmp(pathName, "/") == 0) {
+        printf("MKDIR ERROR: cannot create root directory\n");
+        return;
+    }
+
     struct NODE* parent = splitPath(pathName, baseName, dirName);
 
     if (!parent) {
@@ -28,7 +41,7 @@ void mkdir(char pathName[]){
         child = child->siblingPtr;
     }
 
-    // Allocate and initialize new directory node
+    // Allocate and initialize new node
     struct NODE* newDir = (struct NODE*)malloc(sizeof(struct NODE));
     strcpy(newDir->name, baseName);
     newDir->fileType = 'D';
@@ -36,7 +49,7 @@ void mkdir(char pathName[]){
     newDir->siblingPtr = NULL;
     newDir->parentPtr = parent;
 
-    // Insert into parent's child list
+    // Link into tree
     if (!parent->childPtr)
         parent->childPtr = newDir;
     else {
@@ -46,18 +59,8 @@ void mkdir(char pathName[]){
         temp->siblingPtr = newDir;
     }
 
-    // Construct full path for nicer output
-    char fullPath[128] = "";
-    if (pathName[0] == '/') {
-        strcpy(fullPath, pathName);
-    } else {
-        if (strlen(dirName) > 0)
-            sprintf(fullPath, "%s/%s", dirName, baseName);
-        else
-            strcpy(fullPath, baseName);
-    }
-
-    printf("MKDIR SUCCESS: node %s successfully created\n", fullPath);
+    // Print confirmation
+    printf("MKDIR SUCCESS: node %s successfully created\n", pathName);
 }
 
 
