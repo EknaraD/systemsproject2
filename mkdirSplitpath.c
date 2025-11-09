@@ -14,9 +14,6 @@ void mkdir(char pathName[]){
 
     // Handle empty or missing argument
     if (strlen(pathName) == 0 || strcmp(pathName, "/") == 0) {
-        if (strlen(pathName) == 0)
-            printf("MKDIR ERROR: no path provided\n");
-        else
             printf("MKDIR ERROR: no path provided\n");
         return;
     }
